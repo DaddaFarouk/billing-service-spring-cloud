@@ -2,6 +2,7 @@ package com.farouk.billingservice.feign;
 
 import com.farouk.billingservice.models.Customer;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
