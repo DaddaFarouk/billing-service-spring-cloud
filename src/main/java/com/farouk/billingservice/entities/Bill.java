@@ -1,6 +1,7 @@
 package com.farouk.billingservice.entities;
 
-import com.farouk.billingservice.models.Customer;
+import com.farouk.billingservice.entities.ProductItem;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,4 @@ public class Bill {
     @OneToMany(mappedBy = "bill")
     private Collection<ProductItem> productItems;
     private Long customerID;
-    @Transient
-    private Customer customer;
 }

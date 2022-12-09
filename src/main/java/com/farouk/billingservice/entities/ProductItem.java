@@ -13,14 +13,11 @@ import javax.persistence.*;
 public class ProductItem {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private double quantity;
+    private int quantity;
     private double price;
     private long productID;
     @ManyToOne
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Bill bill;
-    @Transient
-    private Product product;
-    @Transient
     private String productName;
 }
