@@ -4,24 +4,22 @@ import com.farouk.billingservice.entities.Bill;
 import com.farouk.billingservice.feign.ProductItemRestClient;
 import com.farouk.billingservice.models.Product;
 import com.farouk.billingservice.repositories.BillRepository;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import com.farouk.billingservice.repositories.ProductItemRepository;
+import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = {"http://localhost:4200","http://localhost:8888"})
 public class BillingRestController {
     private final BillRepository billRepository;
     private final ProductItemRestClient productItemRestClient;
+    private final ProductItemRepository productItemRepository;
 
-    public BillingRestController(BillRepository billRepository, ProductItemRestClient productItemRestClient) {
+    public BillingRestController(BillRepository billRepository, ProductItemRestClient productItemRestClient, ProductItemRepository productItemRepository) {
         this.billRepository = billRepository;
         this.productItemRestClient = productItemRestClient;
+        this.productItemRepository = productItemRepository;
     }
 
     @GetMapping(path = "/fullBill/{id}")
@@ -45,5 +43,12 @@ public class BillingRestController {
             });
         }));
         return bills;
+    }
+
+    @DeleteMapping(path = "/fullBill/{id}")
+    public void deleteBill(@PathVariable(name = "id") Long id){
+        Bill bill = billRepository.findById(id).orElseThrow();
+        productItemRepository.deleteAll(bill.getProductItems());
+        billRepository.delete(bill);
     }
 }
