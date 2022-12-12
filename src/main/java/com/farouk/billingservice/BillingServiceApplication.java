@@ -35,24 +35,27 @@ public class BillingServiceApplication {
                             ProductItemRestClient productItemRestClient
                             ){
         return args -> {
-            for (long i = 1L; i < 4L; i++) {
+            for (long i = 1L; i < 6L; i++) {
                 Customer customer = customerRestClient.getCustomerById(i);
-                Bill bill = billRepository.save(new Bill(null, new Date(),null,customer.getId()));
+                Bill bill = billRepository.save(new Bill(null, new Date(),null,customer.getId(),0));
                 Collection<ProductItem> productItems = new ArrayList<>();
                 PagedModel<Product> pagedProducts = productItemRestClient.pagedProducts();
                 pagedProducts.forEach(product -> {
                     if(Math.random()>=0.5){
                     ProductItem productItem = new ProductItem();
                     productItem.setProductName(product.getName());
-                    productItem.setPrice(product.getPrice());
-                    productItem.setQuantity(1 + new Random().nextInt(100));
+                    productItem.setQuantity(1 + new Random().nextInt(15));
+                        productItem.setPrice(product.getPrice()*productItem.getQuantity());
                     productItem.setBill(bill);
                     productItem.setProductID(product.getId());
-                        productItemRepository.save(productItem);
-                        productItems.add(productItem);
+                    productItemRepository.save(productItem);
+                    productItems.add(productItem);
+                    bill.setTotalPrice(bill.getTotalPrice()+productItem.getPrice());
                     }
                 });
                 bill.setProductItems(productItems);
+                bill.getProductItems().forEach(productItem -> {
+                });
                 billRepository.save(bill);
             }
         };

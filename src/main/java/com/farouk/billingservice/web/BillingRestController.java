@@ -1,6 +1,7 @@
 package com.farouk.billingservice.web;
 
 import com.farouk.billingservice.entities.Bill;
+import com.farouk.billingservice.entities.ProductItem;
 import com.farouk.billingservice.feign.ProductItemRestClient;
 import com.farouk.billingservice.models.Product;
 import com.farouk.billingservice.repositories.BillRepository;
@@ -24,7 +25,7 @@ public class BillingRestController {
 
     @GetMapping(path = "/fullBill/{id}")
     public Bill getBill(@PathVariable(name = "id") Long id){
-        Bill bill = billRepository.findById(id).get();
+        Bill bill = billRepository.findById(id).orElseThrow();
         bill.getProductItems().forEach(productItem -> {
             Product product = productItemRestClient.getProductById(productItem.getProductID());
             //productItem.setProduct(product);
@@ -36,12 +37,10 @@ public class BillingRestController {
     @GetMapping(path = "/fullBills")
     public List<Bill> getBills(){
         List<Bill> bills = billRepository.findAll();
-        bills.forEach((bill -> {
-            bill.getProductItems().forEach(productItem -> {
-                Product product = productItemRestClient.getProductById(productItem.getProductID());
-                productItem.setProductName(product.getName());
-            });
-        }));
+        bills.forEach((bill -> bill.getProductItems().forEach(productItem -> {
+            Product product = productItemRestClient.getProductById(productItem.getProductID());
+            productItem.setProductName(product.getName());
+        })));
         return bills;
     }
 
@@ -50,5 +49,25 @@ public class BillingRestController {
         Bill bill = billRepository.findById(id).orElseThrow();
         productItemRepository.deleteAll(bill.getProductItems());
         billRepository.delete(bill);
+    }
+
+    @PutMapping(path = "/fullBill/{id}")
+    public void updateBill(@PathVariable(name = "id") Long id, @RequestBody Bill newBill){
+        Bill bill = billRepository.findById(id).orElseThrow();
+        bill.setProductItems(newBill.getProductItems());
+        if (bill.getProductItems().isEmpty()){
+            billRepository.delete(bill);
+        } else {
+            billRepository.save(bill);
+        }
+    }
+
+    @PostMapping(path = "/addBill")
+    public void addProductItem(@RequestBody ProductItem newProductItem){
+        Bill bill = billRepository.findById(newProductItem.getBill().getId()).orElseThrow();
+        productItemRepository.save(newProductItem);
+        bill.setTotalPrice(bill.getTotalPrice()+newProductItem.getPrice());
+        bill.getProductItems().add(newProductItem);
+        billRepository.save(bill);
     }
 }

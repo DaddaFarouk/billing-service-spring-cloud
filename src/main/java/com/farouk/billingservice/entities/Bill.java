@@ -19,4 +19,6 @@ public class Bill {
     @OneToMany(mappedBy = "bill")
     private Collection<ProductItem> productItems;
     private Long customerID;
+
+    private double totalPrice;
 }
