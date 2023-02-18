@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:4200","http://localhost:8888"})
+@CrossOrigin(origins = {"http://localhost:4200","http://localhost:8888","http://localhost:8080"})
 public class BillingRestController {
     private final BillRepository billRepository;
     private final ProductItemRestClient productItemRestClient;
